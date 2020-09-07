@@ -54,7 +54,7 @@ public class Main extends Application {
 		ObservableList<ListViewItem> listItems;
         
 		directoryChooser.setTitle("Choose directory");
-        directoryChooserStage.setAlwaysOnTop(true);
+        directoryChooserStage.setAlwaysOnTop(true); // not sure the "setAlwaysOnTop" is really useful but it's staying here for now
         selectedDirectory = directoryChooser.showDialog(directoryChooserStage);
         directoryChooserStage.setAlwaysOnTop(false);
         
@@ -65,16 +65,6 @@ public class Main extends Application {
         }
         listItems = FXCollections.observableList(listViewItems);
 		listView.setItems(listItems);
-		mainProgramLayout.getChildren().add(listView);
-	}
-	
-	private void printCheckedFiles(List<ListViewItem> items) {
-		System.out.println("Checked items: ");
-		for (ListViewItem item : items) {
-			if (item.isCheckedProperty().get() == true) {
-				System.out.println(item);
-			}
-		}
 	}
 	
 	@Override
@@ -96,9 +86,10 @@ public class Main extends Application {
                 return item.isCheckedProperty();
             }
         }));
-		
+	
 		mainProgramLayout = new VBox(20); // gap = 20px
 		mainScene = new Scene(mainProgramLayout, 400, 400);
+		mainProgramLayout.getChildren().add(listView);
 		
 		buttonAreaLayout = new HBox(20); // gap = 20px
 		addDigitsButton = new Button("Add leading digits");
@@ -112,7 +103,7 @@ public class Main extends Application {
             	for (ListViewItem crtItem : items) {
             		crtItem.addLeadingDigits(4); // for now it's a default value, but the user will be able to change it
             	}
-            	listView.getItems().remove(0);
+            	listView.setItems(FXCollections.observableList(items)); // this is done to update the list view
             }
         });
 		
@@ -123,6 +114,7 @@ public class Main extends Application {
             	for (ListViewItem crtItem : items) {
             		crtItem.removeLeadingDigits(4); // for now it's a default value, but the user will be able to change it
             	}
+            	listView.setItems(FXCollections.observableList(items)); // this is done to update the list view
             }
         });
 		
