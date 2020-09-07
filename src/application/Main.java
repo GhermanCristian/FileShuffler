@@ -25,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -46,7 +47,7 @@ public class Main extends Application {
 		return filesInDirectory;
 	}
 	
-	private void clickedButtonAction(VBox mainProgramLayout, ListView<ListViewItem> listView) {
+	private void selectFolderButtonAction(VBox mainProgramLayout, ListView<ListViewItem> listView) {
 		Stage directoryChooserStage = new Stage();
 		DirectoryChooser directoryChooser = new DirectoryChooser();
         
@@ -78,12 +79,13 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
-		StackPane directoryChooserLayout;
-		Button selectFolderButton;
-		Scene directoryChooserScene;
-		
 		VBox mainProgramLayout;
 		Scene mainScene;
+		
+		HBox buttonAreaLayout;
+		Button addDigitsButton;
+		Button removeDigitsButton;
+		Button selectFolderButton;
 		
 		ListView<ListViewItem> listView = new ListView<ListViewItem>();
 		listView.setOrientation(Orientation.VERTICAL); // the orientation would've been vertical by default, but it's good to be safe
@@ -98,52 +100,49 @@ public class Main extends Application {
 		mainProgramLayout = new VBox(20); // gap = 20px
 		mainScene = new Scene(mainProgramLayout, 400, 400);
 		
-		directoryChooserLayout = new StackPane();
-		selectFolderButton = new Button("Choose folder");
+		buttonAreaLayout = new HBox(20); // gap = 20px
+		addDigitsButton = new Button("Add leading digits");
+		removeDigitsButton = new Button("Remove leading digits");
+		selectFolderButton = new Button("Select folder");
+		
+		addDigitsButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	List<ListViewItem> items = listView.getItems();
+            	for (ListViewItem crtItem : items) {
+            		crtItem.addLeadingDigits(4); // for now it's a default value, but the user will be able to change it
+            	}
+            	listView.getItems().remove(0);
+            }
+        });
+		
+		removeDigitsButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	List<ListViewItem> items = listView.getItems();
+            	for (ListViewItem crtItem : items) {
+            		crtItem.removeLeadingDigits(4); // for now it's a default value, but the user will be able to change it
+            	}
+            }
+        });
+		
 		selectFolderButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
             	primaryStage.setAlwaysOnTop(false); // the setAlwaysOnTop stuff might not be that useful, but we keep it for now
-                clickedButtonAction(mainProgramLayout, listView);
+                selectFolderButtonAction(mainProgramLayout, listView);
                 primaryStage.setAlwaysOnTop(true);
-                primaryStage.setScene(mainScene); // after we click the button, we move to the next scene
             }
         });
 		
-		directoryChooserLayout.getChildren().add(selectFolderButton);
-		directoryChooserScene = new Scene(directoryChooserLayout, 400, 400);
-		
-		directoryChooserScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		primaryStage.setScene(directoryChooserScene);
+		buttonAreaLayout.getChildren().addAll(addDigitsButton, removeDigitsButton, selectFolderButton);
+		mainProgramLayout.getChildren().add(buttonAreaLayout);
+		primaryStage.setScene(mainScene);
 		primaryStage.setTitle("File Shuffler");
 		primaryStage.show();
-		
 	}
 	
 	public static void main(String[] args) {
 		launch(args);
 	}
-}
-
-class ListViewItem{
-	private File crtFile;
-	private BooleanProperty isChecked = new SimpleBooleanProperty();
-	
-	public ListViewItem(File crtFile, boolean isChecked) {
-		this.crtFile = crtFile;
-		this.isChecked.set(isChecked);
-	}
-	
-	public final BooleanProperty isCheckedProperty() {
-		return this.isChecked;
-	}
-	
-	public final File getFile() {
-		return this.crtFile;
-	}
-	
-    @Override
-    public String toString() {
-        return this.crtFile.toString();
-    }
 }
