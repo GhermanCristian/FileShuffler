@@ -64,10 +64,11 @@ class ListViewItem{
     			return; // the first "leadingDigits" characters are not all digits
     		}
     	}
+    
     	if (oldName.charAt(leadingDigits) != '_') {
     		return; // the first character after the leading digits is not the separator (underscore)
     	}
-    	
+
     	Path newFileName = Paths.get(this.crtFile.getParent(), oldName.substring(leadingDigits + 1));
     	System.out.println(newFileName);
     	File newFile = newFileName.toFile();
