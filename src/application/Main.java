@@ -4,12 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
-import com.sun.glass.events.WindowEvent;
-
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -18,7 +13,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.scene.Scene;
@@ -34,6 +28,11 @@ import javafx.scene.control.Label;
 
 public class Main extends Application {
 	private File selectedDirectory = null;
+	
+	private final int WINDOW_WIDTH = 450;
+	private final int WINDOW_HEIGHT = 400;
+	private final int GAP = 20;
+	private final int DEFAULT_ADDED_DIGITS = 4;
 	
 	private List<File> getFilesInDirectory() {
 		List<File> filesInDirectory = new Vector<File>();
@@ -71,18 +70,29 @@ public class Main extends Application {
 	}
 	
 	private int selectDigitCountButtonAction() {
-		Stage newStage = new Stage();
-		Scene newScene;
+		final int SELECT_DIGITS_WINDOW_HEIGHT = 175;
+		
+		Stage currentStage = new Stage();
+		Scene currentScene;
+		VBox layout = new VBox(GAP);
 		Slider slider = new Slider();
-		VBox layout = new VBox(20);
-		Label filenameExampleLabel = new Label("0123_Undeva-n Balkani.mp3"); // 4 digits of 1 because that's the default value
+		Label filenameExampleLabel = new Label("Example: 0123_Undeva-n Balkani.mp3"); // 4 digits of 1 because that's the default value
+		Button selectButton = new Button("Select");
 		
 		Vector<Integer> selectedDigits = new Vector<Integer>();
-		selectedDigits.add(4);
+		selectedDigits.add(DEFAULT_ADDED_DIGITS);
+		
+		selectButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	selectedDigits.setElementAt((int)slider.getValue(), 0);
+            	currentStage.close();
+            }
+        });
 		
 		slider.setMin(1);
 		slider.setMax(10);
-		slider.setValue(4);
+		slider.setValue(DEFAULT_ADDED_DIGITS);
 		slider.setShowTickLabels(true);
 		slider.setShowTickMarks(true);
 		slider.setSnapToTicks(true);
@@ -92,7 +102,7 @@ public class Main extends Application {
 		
 		slider.valueProperty().addListener(new ChangeListener<Number>() {
 			public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
-				String example = new String();
+				String example = new String("Example: ");
 				selectedDigits.setElementAt(new_val.intValue(), 0);
 				for (int i = 0; i < new_val.intValue(); i++) { 
 					// new_val should always be of type int, but we need to convert to int explicitly
@@ -103,11 +113,13 @@ public class Main extends Application {
 			}
         });
 		
-		layout.getChildren().addAll(slider, filenameExampleLabel);
-		newScene = new Scene(layout, 450, 175);
-		newStage.setScene(newScene);
-		newStage.setAlwaysOnTop(true);
-		newStage.showAndWait();
+		layout.getChildren().addAll(slider, filenameExampleLabel, selectButton);
+		currentScene = new Scene(layout, WINDOW_WIDTH, SELECT_DIGITS_WINDOW_HEIGHT);
+		currentStage.setTitle("Select no. of digits");
+		currentStage.setScene(currentScene);
+		currentStage.setAlwaysOnTop(true);
+		currentStage.setOnCloseRequest(event -> {selectedDigits.setElementAt(DEFAULT_ADDED_DIGITS, 0);});
+		currentStage.showAndWait();
 		
 		return selectedDigits.get(0);
 	}
@@ -132,11 +144,11 @@ public class Main extends Application {
             }
         }));
 	
-		mainProgramLayout = new VBox(20); // gap = 20px
-		mainScene = new Scene(mainProgramLayout, 450, 400);
+		mainProgramLayout = new VBox(GAP);
+		mainScene = new Scene(mainProgramLayout, WINDOW_WIDTH, WINDOW_HEIGHT);
 		mainProgramLayout.getChildren().add(listView);
 		
-		buttonAreaLayout = new HBox(20); // gap = 20px
+		buttonAreaLayout = new HBox(GAP);
 		addDigitsButton = new Button("Add leading digit group");
 		removeDigitsButton = new Button("Remove leading digit group");
 		selectFolderButton = new Button("Select folder");
@@ -146,7 +158,6 @@ public class Main extends Application {
             public void handle(ActionEvent event) {
             	List<ListViewItem> items = listView.getItems();
             	int selectedDigits = selectDigitCountButtonAction();
-            	System.out.println(selectedDigits);
             	for (ListViewItem crtItem : items) {
             		crtItem.addLeadingDigits(selectedDigits);
             	}

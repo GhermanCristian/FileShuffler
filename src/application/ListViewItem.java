@@ -42,7 +42,6 @@ class ListViewItem{
     	leadingString += "_";
     	
     	Path newFileName = Paths.get(this.crtFile.getParent(), leadingString + this.crtFile.getName());
-    	System.out.println(newFileName);
     	File newFile = newFileName.toFile();
     	this.crtFile.renameTo(newFile);
     	crtFile = newFile;
@@ -70,7 +69,6 @@ class ListViewItem{
     	}
 
     	Path newFileName = Paths.get(this.crtFile.getParent(), oldName.substring(leadingDigits + 1));
-    	System.out.println(newFileName);
     	File newFile = newFileName.toFile();
     	this.crtFile.renameTo(newFile);
     	crtFile = newFile;
