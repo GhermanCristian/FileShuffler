@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -21,6 +22,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -29,10 +31,12 @@ import javafx.scene.control.Label;
 public class Main extends Application {
 	private File selectedDirectory = null;
 	
-	private final int WINDOW_WIDTH = 450;
+	private final int WINDOW_WIDTH = 500;
 	private final int WINDOW_HEIGHT = 400;
 	private final int GAP = 20;
 	private final int DEFAULT_ADDED_DIGITS = 4;
+	private final int LATERAL_BUTTON_WIDTH = 180;
+	private final int CENTRAL_BUTTON_WIDTH = 100;
 	
 	private List<File> getFilesInDirectory() {
 		List<File> filesInDirectory = new Vector<File>();
@@ -124,15 +128,25 @@ public class Main extends Application {
 		return selectedDigits.get(0);
 	}
 	
+	private void setAllCheckedValue(ListView<ListViewItem> listView, boolean value) {
+		List<ListViewItem> items = listView.getItems();
+    	for (ListViewItem crtItem : items) {
+    		crtItem.setCheckedValue(value);
+    	}
+    	listView.setItems(FXCollections.observableList(items)); // this is done to update the list view
+	}
+	
 	@Override
 	public void start(Stage primaryStage) {
 		VBox mainProgramLayout;
 		Scene mainScene;
 		
-		HBox buttonAreaLayout;
+		GridPane buttonAreaLayout1 = new GridPane();
 		Button addDigitsButton;
 		Button removeDigitsButton;
 		Button selectFolderButton;
+		Button selectAllFilesButton;
+		Button deselectAllFilesButton;
 		
 		ListView<ListViewItem> listView = new ListView<ListViewItem>();
 		listView.setOrientation(Orientation.VERTICAL); // the orientation would've been vertical by default, but it's good to be safe
@@ -146,12 +160,19 @@ public class Main extends Application {
 	
 		mainProgramLayout = new VBox(GAP);
 		mainScene = new Scene(mainProgramLayout, WINDOW_WIDTH, WINDOW_HEIGHT);
+		mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		mainProgramLayout.getChildren().add(listView);
 		
-		buttonAreaLayout = new HBox(GAP);
 		addDigitsButton = new Button("Add leading digit group");
+		addDigitsButton.setMinWidth(LATERAL_BUTTON_WIDTH);
 		removeDigitsButton = new Button("Remove leading digit group");
+		removeDigitsButton.setMinWidth(LATERAL_BUTTON_WIDTH);
 		selectFolderButton = new Button("Select folder");
+		selectFolderButton.setMinWidth(CENTRAL_BUTTON_WIDTH);
+		selectAllFilesButton = new Button("Select all files");
+		selectAllFilesButton.setMinWidth(LATERAL_BUTTON_WIDTH);
+		deselectAllFilesButton = new Button("Deselect all files");
+		deselectAllFilesButton.setMinWidth(LATERAL_BUTTON_WIDTH);
 		
 		addDigitsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -164,7 +185,6 @@ public class Main extends Application {
             	listView.setItems(FXCollections.observableList(items)); // this is done to update the list view
             }
         });
-		
 		removeDigitsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -176,7 +196,6 @@ public class Main extends Application {
             	listView.setItems(FXCollections.observableList(items)); // this is done to update the list view
             }
         });
-		
 		selectFolderButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -185,9 +204,33 @@ public class Main extends Application {
                 primaryStage.setAlwaysOnTop(true);
             }
         });
+		selectAllFilesButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	setAllCheckedValue(listView, true); // the files are selected => checked value = true
+            }
+        });
 		
-		buttonAreaLayout.getChildren().addAll(addDigitsButton, removeDigitsButton, selectFolderButton);
-		mainProgramLayout.getChildren().add(buttonAreaLayout);
+		deselectAllFilesButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	setAllCheckedValue(listView, false); // the files are selected => checked value = true
+            }
+        });
+		
+		GridPane.setConstraints(addDigitsButton, 0, 0);
+		GridPane.setHalignment(addDigitsButton, HPos.CENTER);
+		GridPane.setConstraints(removeDigitsButton, 2, 0);
+		GridPane.setHalignment(removeDigitsButton, HPos.CENTER);
+		GridPane.setConstraints(selectFolderButton, 1, 0);
+		GridPane.setHalignment(selectFolderButton, HPos.CENTER);
+		GridPane.setConstraints(selectAllFilesButton, 0, 1);
+		GridPane.setHalignment(selectAllFilesButton, HPos.LEFT);
+		GridPane.setConstraints(deselectAllFilesButton, 2, 1);
+		GridPane.setHalignment(selectAllFilesButton, HPos.RIGHT);
+		buttonAreaLayout1.getStyleClass().add("gridpane");
+		buttonAreaLayout1.getChildren().addAll(addDigitsButton, removeDigitsButton, selectFolderButton, selectAllFilesButton, deselectAllFilesButton);
+		mainProgramLayout.getChildren().add(buttonAreaLayout1);
 		primaryStage.setScene(mainScene);
 		primaryStage.setTitle("File Shuffler");
 		primaryStage.show();

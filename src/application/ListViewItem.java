@@ -20,6 +20,10 @@ class ListViewItem{
 		return this.isChecked;
 	}
 	
+	public void setCheckedValue(boolean value) {
+		this.isChecked.set(value);
+	}
+	
 	public final File getFile() {
 		return this.crtFile;
 	}
