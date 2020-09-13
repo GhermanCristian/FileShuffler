@@ -51,27 +51,28 @@ class ListViewItem{
     	crtFile = newFile;
     }
     
-    public void removeLeadingDigits(int leadingDigits) {
+    public void removeLeadingDigits() {
     	if (this.isChecked.get() == false) {
     		return; // only modifiy the checked files
     	}
     	
     	String oldName = this.crtFile.getName();
+    	int leadingDigits = 0;
     	
-    	if (leadingDigits + 1 > oldName.length()) {
-    		return; // in case the string is not long enough there's no need to even check for the leading digits
-    	}
-    	
-    	for (int position = 0; position < leadingDigits; position++) {
-    		if (oldName.charAt(position) < '0' || oldName.charAt(position) > '9') {
-    			return; // the first "leadingDigits" characters are not all digits
+    	while (leadingDigits < oldName.length()) {
+    		char currentCharacter = oldName.charAt(leadingDigits);
+    		if (currentCharacter < '0' || currentCharacter > '9') {
+    			break;
     		}
+    		leadingDigits++;
     	}
-    
-    	if (oldName.charAt(leadingDigits) != '_') {
-    		return; // the first character after the leading digits is not the separator (underscore)
+    	
+    	if (leadingDigits >= oldName.length() || oldName.charAt(leadingDigits) != '_') {
+    		return; 
+    		// the leading digits format is: ddddddd_
+    		// so if there's no _ => invalid format => we don't remove anything
     	}
-
+    	
     	Path newFileName = Paths.get(this.crtFile.getParent(), oldName.substring(leadingDigits + 1));
     	File newFile = newFileName.toFile();
     	this.crtFile.renameTo(newFile);

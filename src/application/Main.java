@@ -189,9 +189,8 @@ public class Main extends Application {
             @Override
             public void handle(ActionEvent event) {
             	List<ListViewItem> items = listView.getItems();
-            	int selectedDigits = selectDigitCountButtonAction();
             	for (ListViewItem crtItem : items) {
-            		crtItem.removeLeadingDigits(selectedDigits);
+            		crtItem.removeLeadingDigits();
             	}
             	listView.setItems(FXCollections.observableList(items)); // this is done to update the list view
             }
