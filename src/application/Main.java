@@ -15,6 +15,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -124,6 +125,8 @@ public class Main extends Application {
 		currentScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		currentStage.setTitle("Select no. of digits");
 		currentStage.setScene(currentScene);
+		currentStage.setResizable(false);
+		currentStage.initStyle(StageStyle.UTILITY);
 		currentStage.setAlwaysOnTop(true);
 		currentStage.setOnCloseRequest(event -> {selectedDigits.setElementAt(DEFAULT_ADDED_DIGITS, 0);});
 		currentStage.showAndWait();
@@ -139,17 +142,43 @@ public class Main extends Application {
     	listView.setItems(FXCollections.observableList(items)); // this is done to update the list view
 	}
 	
+	private void aboutScreenButtonAction() {
+		final int WINDOW_WIDTH = 500;
+		final int WINDOW_HEIGHT = 200;
+		
+		VBox layout = new VBox(GAP);
+		Stage currentStage = new Stage();
+		Scene currentScene;
+		Label label1 = new Label("File Shuffler");
+		label1.setStyle("-fx-font: normal bold 27px 'serif' ");
+		Label label2 = new Label("Shuffle files by renaming them with random numbers");
+		label2.setStyle("-fx-font: normal bold 15px 'lucidasans' ");
+		Label label3 = new Label("made by Cristian Gherman - 2020");
+		label3.setStyle("-fx-font: normal bold 10px 'verdana' ; -fx-padding: 30 0 0 0;");
+		
+		layout.getChildren().addAll(label1, label2, label3);
+		layout.getStyleClass().add("vboxAboutScreen");
+		currentScene = new Scene(layout, WINDOW_WIDTH, WINDOW_HEIGHT);
+		currentScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		currentStage.setScene(currentScene);
+		currentStage.setResizable(false);
+		currentStage.setAlwaysOnTop(true);
+		currentStage.initStyle(StageStyle.UTILITY);
+		currentStage.show();
+	}
+	
 	@Override
 	public void start(Stage primaryStage) {
 		VBox mainProgramLayout;
 		Scene mainScene;
 		
-		GridPane buttonAreaLayout1 = new GridPane();
+		GridPane buttonAreaLayout = new GridPane();
 		Button addDigitsButton;
 		Button removeDigitsButton;
 		Button selectFolderButton;
 		Button selectAllFilesButton;
 		Button deselectAllFilesButton;
+		Button aboutScreenButton;
 		
 		ListView<ListViewItem> listView = new ListView<ListViewItem>();
 		listView.setOrientation(Orientation.VERTICAL); // the orientation would've been vertical by default, but it's good to be safe
@@ -189,6 +218,8 @@ public class Main extends Application {
 		selectAllFilesButton.setMinWidth(LATERAL_BUTTON_WIDTH);
 		deselectAllFilesButton = new Button("Deselect all files");
 		deselectAllFilesButton.setMinWidth(LATERAL_BUTTON_WIDTH);
+		aboutScreenButton = new Button("About");
+		aboutScreenButton.setMinWidth(CENTRAL_BUTTON_WIDTH);
 		
 		addDigitsButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -231,6 +262,12 @@ public class Main extends Application {
             	setAllCheckedValue(listView, false); // the files are selected => checked value = true
             }
         });
+		aboutScreenButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	aboutScreenButtonAction();
+            }
+        });
 		
 		GridPane.setConstraints(addDigitsButton, 0, 0);
 		GridPane.setHalignment(addDigitsButton, HPos.CENTER);
@@ -241,10 +278,12 @@ public class Main extends Application {
 		GridPane.setConstraints(selectAllFilesButton, 0, 1);
 		GridPane.setHalignment(selectAllFilesButton, HPos.LEFT);
 		GridPane.setConstraints(deselectAllFilesButton, 2, 1);
-		GridPane.setHalignment(selectAllFilesButton, HPos.RIGHT);
-		buttonAreaLayout1.getStyleClass().add("gridpane");
-		buttonAreaLayout1.getChildren().addAll(addDigitsButton, removeDigitsButton, selectFolderButton, selectAllFilesButton, deselectAllFilesButton);
-		mainProgramLayout.getChildren().add(buttonAreaLayout1);
+		GridPane.setHalignment(deselectAllFilesButton, HPos.RIGHT);
+		GridPane.setConstraints(aboutScreenButton, 1, 1);
+		GridPane.setHalignment(aboutScreenButton, HPos.CENTER);
+		buttonAreaLayout.getStyleClass().add("gridpane");
+		buttonAreaLayout.getChildren().addAll(addDigitsButton, removeDigitsButton, selectFolderButton, selectAllFilesButton, deselectAllFilesButton, aboutScreenButton);
+		mainProgramLayout.getChildren().add(buttonAreaLayout);
 		primaryStage.setScene(mainScene);
 		primaryStage.setTitle("File Shuffler");
 		primaryStage.show();
