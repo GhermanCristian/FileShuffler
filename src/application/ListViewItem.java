@@ -24,6 +24,10 @@ class ListViewItem{
 		this.isChecked.set(value);
 	}
 	
+	public void reverseCheckedValue() {
+		this.isChecked.set(!this.isChecked.get());
+	}
+	
 	public final File getFile() {
 		return this.crtFile;
 	}

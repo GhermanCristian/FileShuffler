@@ -93,6 +93,7 @@ public class Main extends Application {
             	currentStage.close();
             }
         });
+		selectButton.setMinWidth(CENTRAL_BUTTON_WIDTH);
 		
 		slider.setMin(1);
 		slider.setMax(10);
@@ -118,7 +119,9 @@ public class Main extends Application {
         });
 		
 		layout.getChildren().addAll(slider, filenameExampleLabel, selectButton);
+		layout.getStyleClass().add("vboxSelectDigits");
 		currentScene = new Scene(layout, WINDOW_WIDTH, SELECT_DIGITS_WINDOW_HEIGHT);
+		currentScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		currentStage.setTitle("Select no. of digits");
 		currentStage.setScene(currentScene);
 		currentStage.setAlwaysOnTop(true);
@@ -157,6 +160,19 @@ public class Main extends Application {
                 return item.isCheckedProperty();
             }
         }));
+		listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ListViewItem>() {
+		    @Override
+		    // this part is still buggy
+		    public void changed(ObservableValue<? extends ListViewItem> observable, ListViewItem oldValue, ListViewItem newValue) {
+		    	if (newValue != null) {
+		    		newValue.reverseCheckedValue();
+		    	}
+		    	else if (oldValue != null){
+		    		listView.getSelectionModel().clearSelection();
+		    	}
+		    }
+		});	
+		listView.getStyleClass().add("mainListView");
 	
 		mainProgramLayout = new VBox(GAP);
 		mainScene = new Scene(mainProgramLayout, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -209,7 +225,6 @@ public class Main extends Application {
             	setAllCheckedValue(listView, true); // the files are selected => checked value = true
             }
         });
-		
 		deselectAllFilesButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
